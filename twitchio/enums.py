@@ -53,3 +53,16 @@ class ModEventEnum(enum.Enum):
 
     moderator_remove = "moderation.moderator.remove"
     moderator_add = "moderation.moderator.add"
+
+class UserNoticeType(enum.Enum):
+
+    subscription = "sub"
+    resubscription = "resub"
+    subscription_gift = "subgift"
+    gift_paid_upgrade = "giftpaidupgrade"
+    anonymous_gift_paid_upgrade = "anongiftpaidupgrade"
+    reward_gift = "rewardgift"
+    raid = "raid"
+    unraid = "unraid"
+    ritual = "ritual"
+    bits_badge_tier = "bitsbadgetier"

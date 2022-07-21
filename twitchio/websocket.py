@@ -41,6 +41,8 @@ from .errors import AuthenticationError
 from .message import Message
 from .parse import parser
 from .chatter import Chatter, PartialChatter, WhisperChatter
+from .notice import UserNotice
+from .enums import UserNoticeType
 
 if TYPE_CHECKING:
     from .client import Client
@@ -423,6 +425,29 @@ class WSConnection:
         tags = dict(x.split("=") for x in rawData.split(";"))
 
         self.dispatch("raw_usernotice", channel, tags)
+
+        author = Chatter(websocket=self, name=tags["login"], tags=tags)
+        msg = Message(content=parsed["message"],
+                      channel=channel,
+                      echo=tags["login"]==parsed["nick"],
+                      tags=tags,
+                      author=author)
+        n = UserNotice(message=msg,
+                       author=author,
+                       tags=tags,
+                       channel=channel,
+                       raw_data=parsed["data"])
+        self.dispatch("usernotice", n)
+
+        subTypes = set([
+                       UserNoticeType.subscription,
+                       UserNoticeType.resubscription,
+                       UserNoticeType.subscription_gift,
+                       UserNoticeType.gift_paid_upgrade,
+                       UserNoticeType.anonymous_gift_paid_upgrade
+                       ])
+        if n.notice_type in subTypes:
+            self.dispatch("usernotice_subscription", n)
 
     async def _join(self, parsed):
         log.debug(f'ACTION: JOIN:: {parsed["channel"]}')

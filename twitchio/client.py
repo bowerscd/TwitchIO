@@ -38,6 +38,7 @@ from .channel import Channel
 from .message import Message
 from .user import User, PartialUser, SearchUser
 from .cache import user_cache, id_cache
+from .notice import UserNotice
 
 __all__ = ("Client",)
 
@@ -784,6 +785,9 @@ class Client:
             :meth:`event_usernotice_subscription` :
             Called when a USERNOTICE Subscription or Re-subscription event is received.
 
+            :meth:`event_usernotice`:
+            Called when a USERNOTICE event is recieved. Parsed into an object.
+
         .. tip::
 
             For more information on how to handle USERNOTICE's visit:
@@ -799,8 +803,20 @@ class Client:
             This could vary depending on the event.
         """
         pass
+    async def event_usernotice(self, notice: UserNotice):
+        """|coro|
 
-    async def event_usernotice_subscription(self, metadata):
+
+        Event called when a USERSTATE is received from Twitch.
+
+        Parameters
+        ------------
+        user: :class:`.User`
+            User object containing relevant information to the USERSTATE.
+        """
+        pass
+
+    async def event_usernotice_subscription(self, notice: UserNotice):
         """|coro|
 
 
@@ -808,9 +824,8 @@ class Client:
 
         Parameters
         ------------
-        metadata: :class:`NoticeSubscription`
-            The object containing various metadata about the subscription event.
-            For ease of use, this contains a :class:`User` and :class:`Channel`.
+        notice: :class:`UserNotice`
+            UserNotice relevant to the USERNOTICE event, guaranteed to be a subscription-related event.
 
         """
         pass
