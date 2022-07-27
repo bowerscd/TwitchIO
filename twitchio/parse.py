@@ -41,6 +41,8 @@ ACTIONS = (
     "RECONNECT",
     "WHISPER",
     "USERNOTICE",
+    "CLEARMSG",
+    "CLEARCHAT"
 )
 ACTIONS2 = ("USERSTATE", "ROOMSTATE", "PRIVMSG", "USERNOTICE", "WHISPER")
 USER_SUB = re.compile(r":(?P<user>.*)!")
@@ -70,6 +72,11 @@ def parser(data: str, nick: str):
         user = re.search(USER_SUB, groups[1]).group("user")
 
     elif groups[2] == "USERNOTICE":
+        action = groups[2]
+        channel = groups[3].lstrip("#")
+        message = " ".join(groups[4:]).lstrip(":")
+
+    elif groups[2] in {"CLEARMSG", "CLEARCHAT"}:
         action = groups[2]
         channel = groups[3].lstrip("#")
         message = " ".join(groups[4:]).lstrip(":")

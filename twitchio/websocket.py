@@ -88,6 +88,8 @@ class WSConnection:
             "MODE": self._mode,
             "RECONNECT": self._reconnect,
             "WHISPER": self._privmsg,
+            "CLEARMSG": self._clearmsg,
+            "CLEARCHAT": self._clearchat,
         }
 
         self.nick = None
@@ -417,6 +419,24 @@ class WSConnection:
 
         self.dispatch("userstate", user)
 
+    async def _clearmsg(self, parsed):
+        log.debug(f'ACTION: CLEARMSG:: {parsed["channel"]} {parsed}')
+        tags = dict(x.split("=") for x in parsed["groups"][0].split(";"))
+        user = PartialChatter(websocket=self,
+                              name=tags.get("@login", None),
+                              message=parsed["message"])
+        ch = Channel(name=parsed['channel'], websocket=self)
+
+        self.dispatch("clearmsg", user, ch, tags.get("target-msg-id", None), tags)
+
+    async def _clearchat(self, parsed):
+        log.debug(f'ACTION: CLEARCHAT:: {parsed["channel"]}')
+        tags = dict(x.split("=") for x in parsed["groups"][0].split(";"))
+        user = PartialChatter(websocket=self,
+                              name=parsed['message'])
+        ch = Channel(name=parsed['channel'], websocket=self)
+        self.dispatch("clearchat", user, ch, tags)
+
     async def _usernotice(self, parsed):
         log.debug(f'ACTION: USERNOTICE:: {parsed["channel"]}')
 
@@ -439,13 +459,11 @@ class WSConnection:
                        raw_data=parsed["data"])
         self.dispatch("usernotice", n)
 
-        subTypes = set([
+        subTypes = {
                        UserNoticeType.subscription,
                        UserNoticeType.resubscription,
                        UserNoticeType.subscription_gift,
-                       UserNoticeType.gift_paid_upgrade,
-                       UserNoticeType.anonymous_gift_paid_upgrade
-                       ])
+                    }
         if n.notice_type in subTypes:
             self.dispatch("usernotice_subscription", n)
 

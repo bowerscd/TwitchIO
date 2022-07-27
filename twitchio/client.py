@@ -39,6 +39,7 @@ from .message import Message
 from .user import User, PartialUser, SearchUser
 from .cache import user_cache, id_cache
 from .notice import UserNotice
+from .chatter import PartialChatter
 
 __all__ = ("Client",)
 
@@ -940,4 +941,22 @@ class Client:
         ----------
         channel: :class:`.Channel`
             The channel that was joined.
+        """
+
+    async def event_clearmsg(self, chatter: PartialChatter, channel: Channel, msg_id: str, tags: dict):
+        """|coro|
+
+        Event called when a user's message is deleted
+
+        Parameters
+        ----------
+        """
+
+    async def event_clearchat(self, chatter: PartialChatter, channel: Channel, tags: dict):
+        """|coro|
+
+        Event called when a user is banned, resulting in a removal of all chats.
+
+        Parameters
+        ----------
         """
