@@ -60,6 +60,9 @@ def parser(data: str, nick: str):
     if action == "PING":
         return dict(action="PING")
 
+    elif groups[1] == "RECONNECT":
+        return dict(action="RECONNECT")
+
     elif groups[2] in {"PRIVMSG", "PRIVMSG(ECHO)"}:
         action = groups[2]
         channel = groups[3].lstrip("#")
